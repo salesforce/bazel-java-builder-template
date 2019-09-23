@@ -26,7 +26,7 @@ def mybuilder_repositories(
     jvm_maven_import_external(
         name = "mybuilder_rules_picocli",
         artifact = "info.picocli:picocli:3.9.5",
-        jar_sha256 = "9bc4992d3b7d98885a2c42c301654f54b13a5747",
+        #jar_sha256 = "9bc4992d3b7d98885a2c42c301654f54b13a5747",
         licenses = ["notice"],
         server_urls = maven_servers,
     )
