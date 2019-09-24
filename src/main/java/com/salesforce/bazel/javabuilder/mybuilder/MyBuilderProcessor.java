@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import static java.nio.file.Files.newBufferedWriter;
+import java.nio.file.Path;
+
 @Command(name="builder-template", description = "builder template")
 public class MyBuilderProcessor implements Callable<Void> {
 
@@ -25,34 +28,23 @@ public class MyBuilderProcessor implements Callable<Void> {
     @Override
     public Void call() throws Exception {
     	MyBuilderProcessor mybuilder = new MyBuilderProcessor();
-    	//inputs to be processed here
     	mybuilder.copyToFile(inputFile, outputFile);
     	return null;
     }
 
-    private Set<String> getInformationFromFile(String filePath) throws IOException {
-        File file = new File(filePath);
-        BufferedReader br = new BufferedReader(new FileReader(file));
+    private static void copyToFile(String filePath, String outputFileName)
+            throws java.io.IOException {
 
-        Set<String> information = new HashSet<>();
-        String info;
-        while ((info = br.readLine()) != null) {
-            information.add(info);
+        Path outputFilePath = java.nio.file.Paths.get(outputFileName);
+        try (
+                BufferedReader br = new BufferedReader(new FileReader(filePath));
+                BufferedWriter writer = newBufferedWriter(outputFilePath)
+        ) {
+            String info;
+            while ((info = br.readLine()) != null) {
+                writer.write(info + "\n");
+            }
         }
-        return information;
-    }
-
-    private void copyToFile(String inputFile, String outputFile) throws Exception {
-    	BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-
-    	Set<String> inputs = getInformationFromFile(inputFile);
-
-    	for(String str:inputs) {
-    		writer.write(str + "\n");
-    	}
-     
-    	writer.close();
-
     }
 
 }
