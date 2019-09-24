@@ -1,3 +1,4 @@
+package(default_visibility = ["//visibility:public"])
 java_binary(
     name = "mybuilder",
     srcs = [
@@ -13,6 +14,7 @@ java_binary(
         "@com_salesforce_bazel_rules_mybuilder//src/java/com/google/devtools/build/lib:worker",
         "@com_salesforce_bazel_rules_mybuilder//src/main/java/com/salesforce/bazel/javabuilder/worker",
         "@mybuilder_rules_commons_io//jar",
+        "@mybuilder_rules_picocli//jar",
     ],
 )
 

@@ -23,6 +23,14 @@ def mybuilder_repositories(
         server_urls = maven_servers,
     )
 
+    jvm_maven_import_external(
+        name = "mybuilder_rules_picocli",
+        artifact = "info.picocli:picocli:3.9.5",
+        #jar_sha256 = "9bc4992d3b7d98885a2c42c301654f54b13a5747",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
     if not native.existing_rule("com_google_protobuf"):
         http_archive(
             name = "com_google_protobuf",
@@ -49,6 +57,11 @@ def mybuilder_repositories(
     native.bind(
         name = "com_salesforce_bazel_javabuilder_rules_mybuilder/dependency/commons_io/commons_io",
         actual = "@mybuilder_rules_commons_io//jar",
+    )
+
+    native.bind(
+        name = "com_salesforce_bazel_javabuilder_rules_mybuilder/dependency/info_picocli/picocli",
+        actual = "@mybuilder_rules_picocli//jar",
     )
 
     native.bind(
