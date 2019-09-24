@@ -8,5 +8,5 @@ java_library(
 
 tree(
     name = "target",
-    builder = "@builder//:builder-java-maven_deploy.jar",
+    builder = "@builder//:mybuilder_deploy.jar",
 )
