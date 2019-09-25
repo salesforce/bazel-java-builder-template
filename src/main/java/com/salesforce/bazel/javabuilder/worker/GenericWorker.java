@@ -28,11 +28,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.devtools.build.lib.worker.WorkerProtocol.WorkRequest;
 import com.google.devtools.build.lib.worker.WorkerProtocol.WorkResponse;
+import com.google.protobuf.ProtocolStringList;
 
 /**
  * This class serves as a helper to either run a builder as a one-off command or as a persistent worker for Bazel.
@@ -69,10 +69,11 @@ public class GenericWorker {
         return result;
     }
 
-    private static List<String> normalize(List<String> args) throws IOException {
-        if ((args.size() == 1) && args.get(0).startsWith("@"))
-            return Files.readAllLines(Paths.get(args.get(0).substring(1)), UTF_8);
-        else
+    private static String[] normalize(String[] args) throws IOException {
+        if ((args.length == 1) && args[0].startsWith("@")) {
+            List<String> lines = Files.readAllLines(Paths.get(args[0].substring(1)), UTF_8);
+            return lines.toArray(new String[lines.size()]);
+        } else
             return args;
     }
 
@@ -91,12 +92,12 @@ public class GenericWorker {
     }
 
     /** This is expected to be called by a main method */
-    public void run(String[] argArray) throws Exception {
-        if (contains(argArray, "--persistent_worker")) {
+    public void run(String[] args) throws Exception {
+        if (contains(args, "--persistent_worker")) {
             runPersistentWorker();
         } else {
-            List<String> args = Arrays.asList(argArray);
-            processor.processRequest(normalize(args));
+            int exitCode = processor.processRequest(normalize(args));
+            System.exit(exitCode);
         }
     }
 
@@ -118,8 +119,9 @@ public class GenericWorker {
                     setupOutput(ps);
 
                     try {
-                        processor.processRequest(request.getArgumentsList());
-                    } catch (Exception e) {
+                        ProtocolStringList argumentsList = request.getArgumentsList();
+                        exitCode = processor.processRequest(argumentsList.toArray(new String[argumentsList.size()]));
+                    } catch (Throwable e) {
                         e.printStackTrace();
                         exitCode = 1;
                     }

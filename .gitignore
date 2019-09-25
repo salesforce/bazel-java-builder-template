@@ -2,7 +2,7 @@
 .bazelrc-local
 
 # bazel-* symlinks.
-/bazel-*
+bazel-*
 
 
 # output folders

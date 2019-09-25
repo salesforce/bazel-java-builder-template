@@ -1,40 +1,68 @@
 package com.salesforce.bazel.javabuilder.mybuilder;
 
-import static java.nio.file.Files.newBufferedWriter;
+import static java.lang.String.format;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.isDirectory;
+import static java.nio.file.Files.size;
+import static java.nio.file.Files.write;
+import static java.nio.file.Paths.get;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
+
+import com.google.common.base.CaseFormat;
+import com.google.common.base.CharMatcher;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(name = "mybuilder", description = "A sample builder which generates a file")
-public class MyBuilderCommand implements Callable<Void> {
+public class MyBuilderCommand implements Callable<Integer> {
 
-    private static void copyToFile(String filePath, String outputFileName) throws java.io.IOException {
+    @Option(names = {"-o", "--output"}, description = "output directory")
+    private Path outputDirectory;
 
-        Path outputFilePath = java.nio.file.Paths.get(outputFileName);
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath)); BufferedWriter writer = newBufferedWriter(outputFilePath)) {
-            String info;
-            while ((info = br.readLine()) != null) {
-                writer.write(info + "\n");
-            }
-        }
-    }
+    @Option(names = {"-i", "--input"}, description = "input files", split = ",")
+    private List<Path> inputFiles;
 
-    @Option(names = {"-o", "--outputFile"}, description = "The Output File")
-    private String outputFile;
-
-    @Option(names = {"-i", "--inputFile"}, description = "The Input File")
-    private String inputFile;
+    @Option(names = {"--current-target"}, description = "target name")
+    private String currentTarget;
 
     @Override
-    public Void call() throws Exception {
-        copyToFile(inputFile, outputFile);
-        return null;
+    public Integer call() throws Exception {
+        String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, CharMatcher.is('-').replaceFrom(currentTarget, '_'));
+
+        List<String> lines = new ArrayList<>();
+        lines.add(format("public class %s {", className));
+        lines.add("");
+        lines.add(format("    // user.dir: %s", System.getProperty("user.dir")));
+        lines.add(format("    //      '.': %s", get(".").toAbsolutePath().normalize()));
+        lines.add("");
+        lines.add(format("    //   output: %s", outputDirectory));
+        lines.add(format("    //           %s (normalized)", outputDirectory.toAbsolutePath().normalize()));
+        lines.add("");
+        inputFiles.forEach(p -> {
+
+            try {
+                lines.add(format("    // %s (%d bytes)", p.toString(), size(p)));
+            } catch (IOException e) {
+                lines.add(format("    // %s: %s", p.toString(), e.getMessage()));
+            }
+
+        });
+
+        lines.add("}");
+
+        if (!isDirectory(outputDirectory)) {
+            createDirectories(outputDirectory);
+        }
+
+        write(outputDirectory.resolve(format("%s.java", className)), lines);
+
+        return 0;
     }
 
 }

@@ -6,6 +6,6 @@ java_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//src/main/java/com/google/devtools/build/lib:worker",
+        "//src/main/java/com/google/devtools/build/lib/worker",
     ],
 )

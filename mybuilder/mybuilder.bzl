@@ -1,70 +1,100 @@
+def _mybuilder_gen_impl(ctx):
+    # scala/private/rule_impls.bzl: def compile_scala
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
-load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
+    resources = ctx.files.srcs
+    current_target = ctx.label
+    output_dir = ctx.outputs.gendir
+    output_jar = ctx.outputs.srcjar
 
-def mybuilder_repositories(
-        maven_servers = ["http://central.maven.org/maven2"]):
-
-
-    # used by MyBuilderProcessor
-    jvm_maven_import_external(
-        name = "mybuilder_rules_commons_io",
-        artifact = "commons-io:commons-io:2.6",
-        jar_sha256 = "f877d304660ac2a142f3865badfc971dec7ed73c747c7f8d5d2f5139ca736513",
-        licenses = ["notice"],
-        server_urls = maven_servers,
+    mybuilder_args = """--input={srcs}
+--output={out}
+--current-target={current_target_name}
+""".format(
+        srcs = ",".join([f.path for f in resources]),
+        srcs_short_paths = ",".join([f.short_path for f in resources]),
+        out = output_dir.path,
+        current_target_name = current_target.name,
     )
 
-    jvm_maven_import_external(
-        name = "mybuilder_rules_guava",
-        artifact = "com.google.guava:guava:21.0",
-        jar_sha256 = "972139718abc8a4893fa78cba8cf7b2c903f35c97aaf44fa3031b0669948b480",
-        licenses = ["notice"],
-        server_urls = maven_servers,
+    argfile = ctx.actions.declare_file(
+        "%s_mybuilder_worker_input" % current_target.name,
+        sibling = output_jar,
     )
 
-    jvm_maven_import_external(
-        name = "mybuilder_rules_picocli",
-        artifact = "info.picocli:picocli:3.9.5",
-        #jar_sha256 = "9bc4992d3b7d98885a2c42c301654f54b13a5747",
-        licenses = ["notice"],
-        server_urls = maven_servers,
+    ctx.actions.write(
+        output = argfile,
+        content = mybuilder_args,
     )
 
-    if not native.existing_rule("com_google_protobuf"):
-        http_archive(
-            name = "com_google_protobuf",
-            sha256 = "d82eb0141ad18e98de47ed7ed415daabead6d5d1bef1b8cccb6aa4d108a9008f",
-            strip_prefix = "protobuf-b4f193788c9f0f05d7e0879ea96cd738630e5d51",
-            # Commit from 2019-05-15, update to protobuf 3.8 when available.
-            url = "https://github.com/protocolbuffers/protobuf/archive/b4f193788c9f0f05d7e0879ea96cd738630e5d51.tar.gz",
-        )
-
-    if not native.existing_rule("zlib"):  # needed by com_google_protobuf
-        http_archive(
-            name = "zlib",
-            build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
-            sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
-            strip_prefix = "zlib-1.2.11",
-            urls = ["https://zlib.net/zlib-1.2.11.tar.gz"],
-        )
-
-    native.bind(
-        name = "com_salesforce_bazel_javabuilder_rules_mybuilder/dependency/com_google_protobuf/protobuf_java",
-        actual = "@com_google_protobuf//:protobuf_java",
+    mybuilder = ctx.attr._mybuilder
+    mybuilder_inputs, _, mybuilder_input_manifests = ctx.resolve_command(
+        tools = [mybuilder],
     )
 
-    native.bind(
-        name = "com_salesforce_bazel_javabuilder_rules_mybuilder/dependency/commons_io/commons_io",
-        actual = "@mybuilder_rules_commons_io//jar",
+    inputs = resources + mybuilder_inputs + [argfile]
+
+    # run code generator
+    ctx.actions.run(
+        inputs = inputs,
+        outputs = [output_dir],
+        executable = mybuilder.files_to_run.executable,
+        input_manifests = mybuilder_input_manifests,
+        mnemonic = "MyBuilder",
+        progress_message = "mybuilder generating sources %s" % current_target.name,
+        execution_requirements = {"supports-workers": "1"},
+        arguments = ["@" + argfile.path],
     )
 
-    native.bind(
-        name = "com_salesforce_bazel_javabuilder_rules_mybuilder/dependency/info_picocli/picocli",
-        actual = "@mybuilder_rules_picocli//jar",
+    # force timestamps to harmonize for deterministic artifacts
+    #ctx.actions.run_shell(
+    #    inputs = inputs + [output_dir],
+    #    outputs = [output_dir],
+    #    command = "find $1 -exec touch -t 198001010000 {{}} \;",
+    #    arguments = [output_dir.path],
+    #)
+
+    jdk = ctx.attr._jdk
+    jdk_inputs, _, jdk_input_manifests = ctx.resolve_command(
+        tools = [jdk],
     )
 
-    native.bind(
-        name = "com_salesforce_bazel_javabuilder_rules_mybuilder/dependency/com_google_guava/guava",
-        actual = "@mybuilder_rules_guava",
+    # generate srcjar
+    ctx.actions.run_shell(
+        inputs = inputs + [output_dir] + jdk_inputs,
+        outputs = [output_jar],
+        progress_message = "mybuilder generating srcjar %s" % current_target.name,
+        command = "$1 cMf $2 -C $3 .",
+        arguments = ["%s/bin/jar" % ctx.attr._jdk[java_common.JavaRuntimeInfo].java_home, output_jar.path, output_dir.path],
     )
+
+mybuilder_gen = rule(
+    attrs = {
+        "srcs": attr.label_list(
+            allow_empty = False,
+            doc = "MyBuilder example input for .txt files",
+            allow_files = [".txt"],
+        ),
+        "gendir": attr.output(
+        	doc = "A directory where '.java' files are generated into.",
+        	mandatory = True,
+        ),
+        "srcjar": attr.output(
+        	doc = "The 'targetname'.srcjar file containing the generated '.java' sources for compilation.",
+        	mandatory = True,
+        ),
+        "_jdk": attr.label(
+            default = Label("@bazel_tools//tools/jdk:current_java_runtime"),
+            providers = [java_common.JavaRuntimeInfo],
+        ),
+        "_mybuilder": attr.label(
+            default = Label(
+                "//src/main/java/com/salesforce/bazel/javabuilder/mybuilder",
+            ),
+        ),
+    },
+    fragments = ["java"],
+    implementation = _mybuilder_gen_impl,
+    doc = """
+Generates a `.srcjar` file for consumption by Bazel and IDEs for further compilation.
+""",
+)

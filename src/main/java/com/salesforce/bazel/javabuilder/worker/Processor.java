@@ -21,9 +21,8 @@
  */
 package com.salesforce.bazel.javabuilder.worker;
 
-import java.util.List;
-
 public interface Processor {
 
-    void processRequest(List<String> args) throws Exception;
+    int processRequest(String[] args) throws Exception;
+
 }

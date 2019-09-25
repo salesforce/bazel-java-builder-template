@@ -3,7 +3,8 @@ A template for wrapping any Java builder (eg., Maven Takari builder) and bring i
 
 ## How it works
 
-This template was heavily inspired by [rules_scala](https://github.com/bazelbuild/rules_scala/).
+This template was heavily inspired by [rules_scala](https://github.com/bazelbuild/rules_scala/) and [rules_avro](https://github.com/meetup/rules_avro).
+It follows the recommendation given by [Deploying Rules](https://docs.bazel.build/versions/master/skylark/deploying.html).
 It's designed to allow wrapping existing Java builders (eg., like Maven Takari builders) for Bazel.
 These builders don't need to be pre-built.
 Instead they will be compiled as part of the Bazel build using those.
