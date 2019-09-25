@@ -8,10 +8,20 @@ load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 INPUT_FILE = "/tmp/dependency.txt"
 OUTPUT_FILE = "/tmp/copy.txt"
 
+
+def get_srcs(deps):
+  return depset(
+        deps)
+
+
+
+
 def _impl(ctx):
     tree = ctx.actions.declare_directory(ctx.attr.name)
+    srcs = get_srcs(ctx.files.deps)
     ctx.actions.run_shell(
         tools = [ctx.executable.builder],
+        inputs = srcs,
         outputs = [tree],
         arguments = [tree.path],
         progress_message = "Running example builder '%s'" % ctx.executable.builder.path,
@@ -25,6 +35,7 @@ mybuilder = rule(
     implementation = _impl,
     attrs = {
         "builder": attr.label(executable=True, cfg = "host", allow_files=True),
+        "deps": attr.label_list(),
     },
 )
 
