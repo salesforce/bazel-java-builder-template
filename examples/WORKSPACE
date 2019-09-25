@@ -25,5 +25,6 @@ maven_install(
 
 local_repository(
     name = "example_builder",
-    path = "/Users/kvijayan/git/bazel-java-builder-template",
+    path = "../../bazel-java-builder-template/mybuilder",
+
 )

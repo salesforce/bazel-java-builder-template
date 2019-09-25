@@ -23,5 +23,5 @@ java_library(
 mybuilder(
     name = "mybuilder",
     builder = "@example_builder//:mybuilder_deploy.jar",
-    deps = [//project1:resources],
+    deps = ["//project1:resources"],
 )
