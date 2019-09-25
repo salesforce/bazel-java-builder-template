@@ -2,6 +2,32 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 
+
+
+#Constants used
+INPUT_FILE = "/tmp/dependency.txt"
+OUTPUT_FILE = "/tmp/copy.txt"
+
+def _impl(ctx):
+    tree = ctx.actions.declare_directory(ctx.attr.name)
+    ctx.actions.run_shell(
+        tools = [ctx.executable.builder],
+        outputs = [tree],
+        arguments = [tree.path],
+        progress_message = "Running example builder '%s'" % ctx.executable.builder.path,
+        command = """
+java -jar {} -i {} -o {} 
+""".format(ctx.executable.builder.path, INPUT_FILE, OUTPUT_FILE),
+    )
+    return [DefaultInfo(files=depset([tree]))]
+
+mybuilder = rule(
+    implementation = _impl,
+    attrs = {
+        "builder": attr.label(executable=True, cfg = "host", allow_files=True),
+    },
+)
+
 def mybuilder_repositories(
         maven_servers = ["http://central.maven.org/maven2"]):
 
