@@ -33,9 +33,12 @@ public class MyBuilderCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        String packageName = currentTarget.toLowerCase();
         String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, CharMatcher.is('-').replaceFrom(currentTarget, '_'));
 
         List<String> lines = new ArrayList<>();
+        lines.add(format("package %s;", packageName));
+        lines.add("");
         lines.add(format("public class %s {", className));
         lines.add("");
         lines.add(format("    // user.dir: %s", System.getProperty("user.dir")));
@@ -56,11 +59,13 @@ public class MyBuilderCommand implements Callable<Integer> {
 
         lines.add("}");
 
-        if (!isDirectory(outputDirectory)) {
-            createDirectories(outputDirectory);
+        Path packageDirectory = outputDirectory.resolve(packageName);
+
+        if (!isDirectory(packageDirectory)) {
+            createDirectories(packageDirectory);
         }
 
-        write(outputDirectory.resolve(format("%s.java", className)), lines);
+        write(packageDirectory.resolve(format("%s.java", className)), lines);
 
         return 0;
     }
