@@ -13,7 +13,7 @@ Support for [persistent workers](https://medium.com/@mmorearty/how-to-create-a-p
 
 * Clone this Git repo
 * Copy your builder source code into `src/main/java`
-* Add the builder dependencies to `pom.xml` and to `builder_rules` function (see [mybuilder.bzl](mybuilder/mybuilder.bzl)).
+* Add the builder dependencies to `pom.xml` and to `builder_rules` function (see [defs.bzl](mybuilder/defs.bzl)).
 * Use the `rename.sh` script to rename the rules.
 
 

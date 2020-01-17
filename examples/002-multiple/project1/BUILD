@@ -1,5 +1,5 @@
 package(default_visibility = ["//visibility:public"])
-load("@rules_mybuilder//mybuilder:mybuilder.bzl", "mybuilder_gen")
+load("@rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen")
 
 filegroup(
     name = "mybuilder_input",
