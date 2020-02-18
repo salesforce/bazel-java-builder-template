@@ -13,8 +13,8 @@ java_binary(
     deps = [
         "//src/main/java/com/google/devtools/build/lib/worker",
         "//src/main/java/com/salesforce/bazel/javabuilder/worker",
-        "@mybuilder_rules_guava//jar",
-        "@mybuilder_rules_picocli//jar",
+        "@mybuilder_rules_guava",
+        "@mybuilder_rules_picocli",
     ],
 )
 

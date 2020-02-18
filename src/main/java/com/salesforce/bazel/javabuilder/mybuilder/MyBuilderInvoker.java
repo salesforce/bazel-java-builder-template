@@ -4,8 +4,6 @@ import com.salesforce.bazel.javabuilder.worker.GenericWorker;
 import com.salesforce.bazel.javabuilder.worker.Processor;
 
 import picocli.CommandLine;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.ParseResult;
 
 /**
  * Main entry point for MyBuilder.
@@ -21,18 +19,7 @@ public class MyBuilderInvoker extends GenericWorker {
 
         @Override
         public int processRequest(String[] args) throws Exception {
-            MyBuilderCommand command = new MyBuilderCommand();
-            try {
-                ParseResult parseResult = new CommandLine(command).parseArgs(args);
-                if (!CommandLine.printHelpIfRequested(parseResult)) {
-                    Integer result = command.call();
-                    return result != null ? result.intValue() : 0;
-                }
-            } catch (ParameterException ex) { // command line arguments could not be parsed
-                System.err.println(ex.getMessage());
-                ex.getCommandLine().usage(System.err);
-            }
-            return 1;
+            return new CommandLine(new MyBuilderCommand()).execute(args);
         }
     }
 

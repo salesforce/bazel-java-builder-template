@@ -1,5 +1,49 @@
 # Bazel Java Builder Template
-A template for wrapping any Java builder (eg., Maven Takari builder) and bring it into Bazel.
+A template for wrapping a based Java source generator (eg., Maven Takari based mojos) and bring it into Bazel.
+
+## Setup
+
+If you want to use the latest stable release, add the following:
+
+```bzl
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "salesforce_rules_mybuilder",
+    url = "https://github.com/salesforce/bazel-java-builder-template/releases/download/....tar.gz",
+    sha256 = "....",
+)
+
+load("@salesforce_rules_mybuilder//mybuilder:repositories.bzl", "rules_mybuilder_dependencies", "rules_mybuilder_toolchains")
+rules_mybuilder_dependencies()
+rules_mybuilder_toolchains()
+```
+
+If you want to use a specific commit (for example, something close to `master`), add the following instead:
+
+```bzl
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "salesforce_rules_mybuilder",
+    remote = "https://github.com/salesforce/bazel-java-builder-template.git",
+    commit = "...",
+)
+
+load("@salesforce_rules_mybuilder//mybuilder:repositories.bzl", "rules_mybuilder_dependencies", "rules_mybuilder_toolchains")
+rules_mybuilder_dependencies()
+rules_mybuilder_toolchains()
+```
+
+If you want to use a local clone (eg., for development purposes) you can override both repository definitions (`git_repository` and `http_archive`) from the command line:
+
+```bash
+git clone git@github.com:salesforce/bazel-java-builder-template.git /Users/me/development/bazel-java-builder-template/
+
+cd ~/blt/app/main/core
+bazel build --override_repository=salesforce_rules_mybuilder=/Users/me/development//bazel-java-builder-template/
+```
+
 
 ## How it works
 

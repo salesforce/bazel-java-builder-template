@@ -1,4 +1,4 @@
-load("@rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen")
+load("@salesforce_rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen")
 
 mybuilder_gen(
 	name = "example",
