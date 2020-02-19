@@ -4,6 +4,20 @@ load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 
 def rules_mybuilder_dependencies(
         maven_servers = ["https://repo1.maven.org/maven2/"]):
+    """
+    Defines run-time dependencies for the Java builder.
+
+    Any dependency not required for running this build (eg., for tests or packaging) should
+    go into the WORKSPACE file in the project root.
+
+    Note, as a best practice, all dependencies are prefixed with "mybuilder_". This was done
+    in order to avoid collisions between the dependencies a builder uses and dependencies
+    the project using a builder has. Users can still override any of the dependencies defined
+    here by declaring a jvm_maven_import_external before calling this method. Bazel has a
+    first-one wins rule.
+
+    maven_servers: list of Maven servers to fetch artifacts from
+    """
 
     jvm_maven_import_external(
         name = "mybuilder_rules_guava",
