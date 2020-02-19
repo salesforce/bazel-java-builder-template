@@ -10,7 +10,7 @@ def rules_mybuilder_dependencies(
     Any dependency not required for running this build (eg., for tests or packaging) should
     go into the WORKSPACE file in the project root.
 
-    Note, as a best practice, all dependencies are prefixed with "mybuilder_". This was done
+    Note, as a best practice, all dependencies are prefixed with "mybuilder_rules_". This was done
     in order to avoid collisions between the dependencies a builder uses and dependencies
     the project using a builder has. Users can still override any of the dependencies defined
     here by declaring a jvm_maven_import_external before calling this method. Bazel has a
