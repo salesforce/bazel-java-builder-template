@@ -38,7 +38,7 @@ def rules_mybuilder_dependencies(
     jvm_maven_import_external(
         name = "mybuilder_rules_protobuf_java",
         artifact = "com.google.protobuf:protobuf-java:3.11.4",
-        artifact_sha256 = "",
+        artifact_sha256 = "42e98f58f53d1a49fd734c2dd193880f2dfec3436a2993a00d06b8800a22a3f2",
         licenses = ["notice"],
         server_urls = maven_servers,
     )
