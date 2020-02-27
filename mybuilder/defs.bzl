@@ -1,10 +1,12 @@
 def _mybuilder_gen_impl(ctx):
-    # scala/private/rule_impls.bzl: def compile_scala
-
     resources = ctx.files.srcs
     current_target = ctx.label
-    output_dir = ctx.outputs.gendir
-    output_jar = ctx.outputs.srcjar
+    output_jar = ctx.outputs.jar
+
+    # our builder requires an output directory for collecting the outputs in
+    gen_dir = ctx.actions.declare_directory(
+        "%s_generated" % current_target.name
+    )
 
     mybuilder_args = """--input={srcs}
 --output={out}
@@ -12,13 +14,12 @@ def _mybuilder_gen_impl(ctx):
 """.format(
         srcs = ",".join([f.path for f in resources]),
         srcs_short_paths = ",".join([f.short_path for f in resources]),
-        out = output_dir.path,
+        out = gen_dir.path,
         current_target_name = current_target.name,
     )
 
     argfile = ctx.actions.declare_file(
-        "%s_mybuilder_worker_input" % current_target.name,
-        sibling = output_jar,
+        "%s_mybuilder_worker_input" % current_target.name
     )
 
     ctx.actions.write(
@@ -36,7 +37,7 @@ def _mybuilder_gen_impl(ctx):
     # run code generator
     ctx.actions.run(
         inputs = inputs,
-        outputs = [output_dir],
+        outputs = [gen_dir],
         executable = mybuilder.files_to_run.executable,
         input_manifests = mybuilder_input_manifests,
         mnemonic = "MyBuilder",
@@ -45,56 +46,123 @@ def _mybuilder_gen_impl(ctx):
         arguments = ["@" + argfile.path],
     )
 
-    # force timestamps to harmonize for deterministic artifacts
-    #ctx.actions.run_shell(
-    #    inputs = inputs + [output_dir],
-    #    outputs = [output_dir],
-    #    command = "find $1 -exec touch -t 198001010000 {{}} \;",
-    #    arguments = [output_dir.path],
-    #)
-
-    jdk = ctx.attr._jdk
-    jdk_inputs, _, jdk_input_manifests = ctx.resolve_command(
-        tools = [jdk],
+    # generate interim srcjar
+    # (we use the singlejar tool here for normalizing timestamps)
+    # note: this is a workaround until we can somehow read all the files 
+    # from gen_dir and give it to java_common.compile below
+    srcjar = ctx.actions.declare_file("%s-gensrc.jar" % current_target.name)
+    srcjar_args = ctx.actions.args()
+    srcjar_args.add_all([
+        "--normalize",
+        "--compression",
+    ])
+    srcjar_args.add("--output", srcjar)
+    srcjar_args.add_all([gen_dir], before_each = "--resources")
+    ctx.actions.run(
+        mnemonic = "MyBuildSrcJar",
+        inputs = [gen_dir],
+        outputs = [srcjar],
+        executable = ctx.executable._singlejar,
+        arguments = [srcjar_args],
+        progress_message = "Creating interim source jar %s for compilation" % srcjar.basename,
     )
 
-    # generate srcjar
-    ctx.actions.run_shell(
-        inputs = inputs + [output_dir] + jdk_inputs,
-        outputs = [output_jar],
-        progress_message = "mybuilder generating srcjar %s" % current_target.name,
-        command = "$1 cMf $2 -C $3 .",
-        arguments = ["%s/bin/jar" % ctx.attr._jdk[java_common.JavaRuntimeInfo].java_home, output_jar.path, output_dir.path],
+    # compile the code
+    java_info = java_common.compile(
+        ctx,
+        java_toolchain = ctx.attr._java_toolchain[java_common.JavaToolchainInfo],
+        host_javabase = ctx.attr._host_javabase[java_common.JavaRuntimeInfo],
+        source_jars = [srcjar],
+        output = ctx.outputs.jar,
+        output_source_jar = ctx.outputs.srcjar,
+        deps = ctx.attr.deps,
     )
+
+    return [java_info]
 
 mybuilder_gen = rule(
+    doc = 
+    """Generates and compiles Java source code (`.jar` and a `.srcjar` file) for consumption by Bazel and IDEs.
+
+    Args:
+     srcs: Input for the code generator
+     deps: Java dependencies for compiling the generated code.
+     jar: the output jar name
+     srcjar: the output source jar name
+    """,
     attrs = {
         "srcs": attr.label_list(
             allow_empty = False,
             doc = "MyBuilder example input for .txt files",
             allow_files = [".txt"],
         ),
-        "gendir": attr.output(
-        	doc = "A directory where '.java' files are generated into.",
-        	mandatory = True,
+        "deps": attr.label_list(
+            doc = "Compile time dependencies (see https://docs.bazel.build/versions/master/be/java.html#java_library).",
+            allow_empty = True,
+            providers = [JavaInfo],
+        ),
+        "jar": attr.output(
+        	doc = "The 'targetname'.jar file containing the compile Java code.",
+        	mandatory = True, 
         ),
         "srcjar": attr.output(
         	doc = "The 'targetname'.srcjar file containing the generated '.java' sources for compilation.",
         	mandatory = True,
         ),
-        "_jdk": attr.label(
-            default = Label("@bazel_tools//tools/jdk:current_java_runtime"),
-            providers = [java_common.JavaRuntimeInfo],
-        ),
         "_mybuilder": attr.label(
+            doc = "Implicit dependency to the java_binary for executing the source code generator.",
             default = Label(
                 "//src/main/java/com/salesforce/bazel/javabuilder/mybuilder",
             ),
         ),
+        "_java_toolchain": attr.label(
+            default = Label("@bazel_tools//tools/jdk:current_java_toolchain"),
+            providers = [java_common.JavaToolchainInfo],
+        ),
+        "_host_javabase": attr.label(
+            cfg = "host",
+            default = Label("@bazel_tools//tools/jdk:current_java_runtime"),
+            providers = [java_common.JavaRuntimeInfo],
+        ),
+        "_singlejar": attr.label(
+            cfg = "host",
+            default = Label("@bazel_tools//tools/jdk:singlejar"),
+            executable = True,
+            allow_files = True,
+        ),
     },
     fragments = ["java"],
+    provides = [JavaInfo],
     implementation = _mybuilder_gen_impl,
-    doc = """
-Generates a `.srcjar` file for consumption by Bazel and IDEs for further compilation.
-""",
 )
+
+# declare any dependencies that the generated source requires for compilation here
+MYBUILDER_DEPENDENCIES = []
+
+def mybuilder_gen_java_library(
+        name,
+        **kwargs):
+    """Macro with defaults for generating Java code for source code generated by `mybuilder_gen` rule.
+
+    Some highelights why the macro is better than using the rule:
+    - default values for `jar` name and `srcjar` name (based on `name`)
+    - implicit builder dependencies (defined in MYBUILDER_DEPENDENCIES) for compilation (maintained by builder authors, no need for developers to worry about)
+
+    Args:
+      name: A unique name for this macro.
+      **kwargs: Other attributes passed on to `mybuilder_gen` rule
+    """
+
+    # remove unwanted arguments
+    kwargs.pop('jar', None)
+    kwargs.pop('srcjar', None)
+
+    # invoke rule
+    mybuilder_gen(
+        name = name,
+        jar =  "lib%s.jar" % name,
+        srcjar =  "lib%s-src.jar" % name,
+        deps = kwargs.pop('deps', []) + MYBUILDER_DEPENDENCIES,
+        **kwargs,
+    )
+

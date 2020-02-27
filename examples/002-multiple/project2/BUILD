@@ -1,6 +1,7 @@
-package(default_visibility = ["//visibility:public"])
-load("@rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen")
+load("@salesforce_rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen_java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
+package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "mybuilder_input",
@@ -26,19 +27,11 @@ java_library(
         "project2_sources",
     ],
     resources = [":mybuilder_input"],
-    deps = ["mybuilder_jar"],
+    deps = ["mybuilder_sources"],
 )
 
-java_library(
-    name = "mybuilder_jar",
-    srcs = [
-        "project2_generated.srcjar",
-    ],
-)
-
-mybuilder_gen(
+mybuilder_gen_java_library(
     name = "mybuilder_sources",
     srcs = [":mybuilder_input", "//project1:mybuilder_input"],
-    gendir = "project2_generated",
-    srcjar = "project2_generated.srcjar",
 )
+

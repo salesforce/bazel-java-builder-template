@@ -1,11 +1,9 @@
-load("@rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen")
+load("@rules_mybuilder//mybuilder:defs.bzl", "mybuilder_gen_java_library")
 
-mybuilder_gen(
+mybuilder_gen_java_library (
 	name = "example",
     srcs = glob(
         ["src/resources/**/*.txt"],
     ),
-    srcjar = "example_generated.srcjar",
-    gendir = "example_generated",
 )
 
