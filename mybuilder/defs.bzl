@@ -8,42 +8,25 @@ def _mybuilder_gen_impl(ctx):
         "%s_generated" % current_target.name
     )
 
-    mybuilder_args = """--input={srcs}
---output={out}
---current-target={current_target_name}
-""".format(
-        srcs = ",".join([f.path for f in resources]),
-        srcs_short_paths = ",".join([f.short_path for f in resources]),
-        out = gen_dir.path,
-        current_target_name = current_target.name,
-    )
+    mybuilder_args = ctx.actions.args()
+    mybuilder_args.add_joined("--input", resources, join_with=",")
+    mybuilder_args.add("--output", gen_dir.path)
+    mybuilder_args.add("--current-target", current_target.name)
 
-    argfile = ctx.actions.declare_file(
-        "%s_mybuilder_worker_input" % current_target.name
-    )
-
-    ctx.actions.write(
-        output = argfile,
-        content = mybuilder_args,
-    )
-
-    mybuilder = ctx.attr._mybuilder
-    mybuilder_inputs, _, mybuilder_input_manifests = ctx.resolve_command(
-        tools = [mybuilder],
-    )
-
-    inputs = resources + mybuilder_inputs + [argfile]
+    # Bazel requires a flagfile for worker mode,
+    # either prefixed with @ or --flagfile= argument
+    mybuilder_args.use_param_file("@%s", use_always = True)
+    mybuilder_args.set_param_file_format("multiline")
 
     # run code generator
     ctx.actions.run(
-        inputs = inputs,
-        outputs = [gen_dir],
-        executable = mybuilder.files_to_run.executable,
-        input_manifests = mybuilder_input_manifests,
         mnemonic = "MyBuilder",
-        progress_message = "mybuilder generating sources %s" % current_target.name,
+        inputs = resources,
+        outputs = [gen_dir],
+        executable = ctx.executable._mybuilder,
         execution_requirements = {"supports-workers": "1"},
-        arguments = ["@" + argfile.path],
+        arguments = [mybuilder_args],
+        progress_message = "mybuilder generating sources %s" % current_target.name,
     )
 
     # generate interim srcjar
@@ -57,7 +40,7 @@ def _mybuilder_gen_impl(ctx):
         "--compression",
     ])
     srcjar_args.add("--output", srcjar)
-    srcjar_args.add_all([gen_dir], before_each = "--resources")
+    srcjar_args.add_all([gen_dir], before_each = "--resources", map_each = _fileToPath)
     ctx.actions.run(
         mnemonic = "MyBuildSrcJar",
         inputs = [gen_dir],
@@ -66,6 +49,7 @@ def _mybuilder_gen_impl(ctx):
         arguments = [srcjar_args],
         progress_message = "Creating interim source jar %s for compilation" % srcjar.basename,
     )
+
 
     # compile the code
     java_info = java_common.compile(
@@ -79,6 +63,9 @@ def _mybuilder_gen_impl(ctx):
     )
 
     return [java_info]
+
+def _fileToPath(file):
+    return file.path + ":" + file.short_path
 
 mybuilder_gen = rule(
     doc = 
@@ -114,6 +101,9 @@ mybuilder_gen = rule(
             default = Label(
                 "//src/main/java/com/salesforce/bazel/javabuilder/mybuilder",
             ),
+            cfg = "host",
+            executable = True,
+            allow_files = True,
         ),
         "_java_toolchain": attr.label(
             default = Label("@bazel_tools//tools/jdk:current_java_toolchain"),

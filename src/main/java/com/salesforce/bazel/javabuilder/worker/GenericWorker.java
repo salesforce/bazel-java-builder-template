@@ -73,8 +73,9 @@ public class GenericWorker {
         if ((args.length == 1) && args[0].startsWith("@")) {
             List<String> lines = Files.readAllLines(Paths.get(args[0].substring(1)), UTF_8);
             return lines.toArray(new String[lines.size()]);
-        } else
+        } else {
             return args;
+        }
     }
 
     protected final Processor processor;
@@ -85,8 +86,9 @@ public class GenericWorker {
 
     private boolean contains(String[] args, String s) {
         for (String str : args) {
-            if (str.equals(s))
+            if (str.equals(s)) {
                 return true;
+            }
         }
         return false;
     }

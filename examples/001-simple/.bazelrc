@@ -1,1 +1,8 @@
 build --javabase=@bazel_tools//tools/jdk:remote_jdk11
+
+# enable builder debugging features in the examples
+build --sandbox_debug
+build --subcommands
+build --verbose_failures
+build --explain=bazel-build-exlain.log
+build --materialize_param_files
