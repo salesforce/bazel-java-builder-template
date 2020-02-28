@@ -40,7 +40,7 @@ def _mybuilder_gen_impl(ctx):
         "--compression",
     ])
     srcjar_args.add("--output", srcjar)
-    srcjar_args.add_all([gen_dir], before_each = "--resources", map_each = _fileToPath)
+    srcjar_args.add_all([gen_dir], before_each = "--resources", map_each = _path_to_short_path)
     ctx.actions.run(
         mnemonic = "MyBuildSrcJar",
         inputs = [gen_dir],
@@ -64,7 +64,7 @@ def _mybuilder_gen_impl(ctx):
 
     return [java_info]
 
-def _fileToPath(file):
+def _path_to_short_path(file):
     return file.path + ":" + file.short_path
 
 mybuilder_gen = rule(
