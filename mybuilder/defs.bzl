@@ -81,8 +81,8 @@ def _mybuilder_gen_impl(ctx):
         source_jars = [srcjar],
         output = ctx.outputs.jar,
         output_source_jar = ctx.outputs.srcjar,
-        deps = ctx.attr.deps,
-        exports = ctx.attr.exports,
+        deps = [d[JavaInfo] for d in ctx.attr.deps],
+        exports = [e[JavaInfo] for e in ctx.attr.exports],
     )
 
     # returning both: DefaultInfo as well as JavaInfo
@@ -93,7 +93,7 @@ def _mybuilder_gen_impl(ctx):
     # Please be aware that the Java files will only be build by Bazel when they are used.
     # One can request them explicitely on the command line:
     #        build build //target:lib<targetname>.jar
-    # 
+    #
     # (https://docs.bazel.build/versions/master/skylark/rules.html#requesting-output-files)
     #
     return [
