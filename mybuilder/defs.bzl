@@ -56,7 +56,7 @@ def _mybuilder_gen_impl(ctx):
     # (we use the singlejar tool here for normalizing timestamps)
     # note: this is a workaround until we can somehow read all the files
     # from gen_dir and give it to java_common.compile below
-    srcjar = ctx.actions.declare_file("%s-gensrc.jar" % current_target.name)
+    srcjar = ctx.outputs.declare_file("%s-gensrc.jar" % current_target.name)
     srcjar_args = ctx.actions.args()
     srcjar_args.add_all([
         "--normalize",
@@ -85,6 +85,17 @@ def _mybuilder_gen_impl(ctx):
         exports = ctx.attr.exports,
     )
 
+    # returning both: DefaultInfo as well as JavaInfo
+    #
+    # Note, this will allow the result to be used in different situations. However,
+    # rule authors may choose to return only one here, i.e. whatever is appropriate.
+    #
+    # Please be aware that the Java files will only be build by Bazel when they are used.
+    # One can request them explicitely on the command line:
+    #        build build //target:lib<targetname>.jar
+    # 
+    # (https://docs.bazel.build/versions/master/skylark/rules.html#requesting-output-files)
+    #
     return [
         DefaultInfo(
             files = gen_dir,
