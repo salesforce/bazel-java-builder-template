@@ -43,7 +43,6 @@ def rules_mybuilder_dependencies(
         server_urls = maven_servers,
     )
 
-
 def rules_mybuilder_toolchains():
     # intentionally empty
     return
