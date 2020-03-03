@@ -17,7 +17,7 @@ java_binary(
         "@mybuilder_rules_picocli",
     ],
     runtime_deps = [
-    	"@mybuilder_rules_slf4j_simple",
+    	"@mybuilder_rules_org_slf4j_simple",
     ],
     resources = [
     	"//src/main/resources:slf4j_simple_properties",

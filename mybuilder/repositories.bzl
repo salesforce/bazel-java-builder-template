@@ -44,33 +44,33 @@ def rules_mybuilder_dependencies(
     )
 
     jvm_maven_import_external(
-        name = "mybuilder_rules_slf4j_api",
-        artifact = "org.slf4j:slf4j-api:1.7.25",
-        artifact_sha256 = "18c4a0095d5c1da6b817592e767bb23d29dd2f560ad74df75ff3961dbde25b79",
+        name = "mybuilder_rules_org_slf4j_api",
+        artifact = "org.slf4j:slf4j-api:1.7.30",
+        artifact_sha256 = "cdba07964d1bb40a0761485c6b1e8c2f8fd9eb1d19c53928ac0d7f9510105c57",
         licenses = ["notice"],
         server_urls = maven_servers,
     )
 
     jvm_maven_import_external(
-        name = "mybuilder_rules_slf4j_simple",
-        artifact = "org.slf4j:slf4j-simple:1.7.25",
-        artifact_sha256 = "0966e86fffa5be52d3d9e7b89dd674d98a03eed0a454fbaf7c1bd9493bd9d874",
+        name = "mybuilder_rules_org_slf4j_simple",
+        artifact = "org.slf4j:slf4j-simple:1.7.30",
+        artifact_sha256 = "8b9279cbff6b9f88594efae3cf02039b6995030eec023ed43928748c41670fee",
         licenses = ["notice"],
         server_urls = maven_servers,
     )
 
     jvm_maven_import_external(
-        name = "mybuilder_rules_jul_to_slf4j",
-        artifact = "org.slf4j:jul-to-slf4j:1.7.25",
-        artifact_sha256 = "416c5a0c145ad19526e108d44b6bf77b75412d47982cce6ce8d43abdbdbb0fac",
+        name = "mybuilder_rules_org_slf4j_jul_to_slf4j",
+        artifact = "org.slf4j:jul-to-slf4j:1.7.30",
+        artifact_sha256 = "bbcbfdaa72572255c4f85207a9bfdb24358dc993e41252331bd4d0913e4988b9",
         licenses = ["notice"],
         server_urls = maven_servers,
     )
 
     jvm_maven_import_external(
-        name = "mybuilder_rules_jcl_over_slf4j",
-        artifact = "org.slf4j:jcl-over-slf4j:1.7.25",
-        artifact_sha256 = "5e938457e79efcbfb3ab64bc29c43ec6c3b95fffcda3c155f4a86cc320c11e14",
+        name = "mybuilder_rules_org_slf4j_jcl_over_slf4j",
+        artifact = "org.slf4j:jcl-over-slf4j:1.7.30",
+        artifact_sha256 = "71e9ee37b9e4eb7802a2acc5f41728a4cf3915e7483d798db3b4ff2ec8847c50",
         licenses = ["notice"],
         server_urls = maven_servers,
     )
