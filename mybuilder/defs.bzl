@@ -56,7 +56,7 @@ def _mybuilder_gen_impl(ctx):
     # (we use the singlejar tool here for normalizing timestamps)
     # note: this is a workaround until we can somehow read all the files
     # from gen_dir and give it to java_common.compile below
-    srcjar = ctx.outputs.declare_file("%s-gensrc.jar" % current_target.name)
+    srcjar = ctx.actions.declare_file("%s-gensrc.jar" % current_target.name)
     srcjar_args = ctx.actions.args()
     srcjar_args.add_all([
         "--normalize",

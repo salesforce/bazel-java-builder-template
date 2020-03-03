@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:private"])
 java_binary(
     name = "mybuilder",
     srcs = [
@@ -16,6 +16,12 @@ java_binary(
         "@mybuilder_rules_guava",
         "@mybuilder_rules_picocli",
     ],
+    runtime_deps = [
+    	"@mybuilder_rules_slf4j_simple",
+    ],
+    resources = [
+    	"//src/main/resources:slf4j_simple_properties",
+    ]
 )
 
 filegroup(

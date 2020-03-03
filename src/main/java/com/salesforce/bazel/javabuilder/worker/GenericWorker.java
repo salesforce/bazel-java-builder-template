@@ -30,6 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 import com.google.devtools.build.lib.worker.WorkerProtocol.WorkRequest;
 import com.google.devtools.build.lib.worker.WorkerProtocol.WorkResponse;
 import com.google.protobuf.ProtocolStringList;
@@ -73,9 +75,8 @@ public class GenericWorker {
         if ((args.length == 1) && args[0].startsWith("@")) {
             List<String> lines = Files.readAllLines(Paths.get(args[0].substring(1)), UTF_8);
             return lines.toArray(new String[lines.size()]);
-        } else {
+        } else
             return args;
-        }
     }
 
     protected final Processor processor;
@@ -86,15 +87,19 @@ public class GenericWorker {
 
     private boolean contains(String[] args, String s) {
         for (String str : args) {
-            if (str.equals(s)) {
+            if (str.equals(s))
                 return true;
-            }
         }
         return false;
     }
 
     /** This is expected to be called by a main method */
     public void run(String[] args) throws Exception {
+        // prepare logging
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
+        // run
         if (contains(args, "--persistent_worker")) {
             runPersistentWorker();
         } else {

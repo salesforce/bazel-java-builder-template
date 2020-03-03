@@ -43,6 +43,38 @@ def rules_mybuilder_dependencies(
         server_urls = maven_servers,
     )
 
+    jvm_maven_import_external(
+        name = "mybuilder_rules_slf4j_api",
+        artifact = "org.slf4j:slf4j-api:1.7.25",
+        artifact_sha256 = "18c4a0095d5c1da6b817592e767bb23d29dd2f560ad74df75ff3961dbde25b79",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
+    jvm_maven_import_external(
+        name = "mybuilder_rules_slf4j_simple",
+        artifact = "org.slf4j:slf4j-simple:1.7.25",
+        artifact_sha256 = "0966e86fffa5be52d3d9e7b89dd674d98a03eed0a454fbaf7c1bd9493bd9d874",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
+    jvm_maven_import_external(
+        name = "mybuilder_rules_jul_to_slf4j",
+        artifact = "org.slf4j:jul-to-slf4j:1.7.25",
+        artifact_sha256 = "416c5a0c145ad19526e108d44b6bf77b75412d47982cce6ce8d43abdbdbb0fac",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
+    jvm_maven_import_external(
+        name = "mybuilder_rules_jcl_over_slf4j",
+        artifact = "org.slf4j:jcl-over-slf4j:1.7.25",
+        artifact_sha256 = "5e938457e79efcbfb3ab64bc29c43ec6c3b95fffcda3c155f4a86cc320c11e14",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
 def rules_mybuilder_toolchains():
     # intentionally empty
     return

@@ -7,5 +7,8 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//src/main/java/com/google/devtools/build/lib/worker",
+        "@mybuilder_rules_slf4j_api",
+        "@mybuilder_rules_jul_to_slf4j",
+        "@mybuilder_rules_jcl_over_slf4j",
     ],
 )
