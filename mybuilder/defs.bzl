@@ -64,6 +64,8 @@ def _mybuilder_gen_impl(ctx):
     ])
     srcjar_args.add("--output", srcjar)
     srcjar_args.add_all(gen_dir_files, before_each = "--resources", map_each = _path_to_short_path_mapping_for_singlejar)
+    srcjar_args.use_param_file("@%s", use_always = True)
+    srcjar_args.set_param_file_format("multiline")
     ctx.actions.run(
         mnemonic = "MyBuildSrcJar",
         inputs = gen_dir_files,
