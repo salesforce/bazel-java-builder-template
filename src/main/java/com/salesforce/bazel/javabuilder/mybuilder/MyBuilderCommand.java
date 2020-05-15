@@ -22,6 +22,11 @@ import picocli.CommandLine.Option;
 @Command(name = "mybuilder", description = "A sample builder which generates a file")
 public class MyBuilderCommand implements Callable<Integer> {
 
+    private static String normalizePath(Object input) {
+        // Windows outputs '\' which breaks .java files
+        return String.valueOf(input).replace('\\', '/');
+    }
+
     @Option(names = {"-o", "--output"}, description = "output directory")
     private Path outputDirectory;
 
@@ -41,18 +46,18 @@ public class MyBuilderCommand implements Callable<Integer> {
         lines.add("");
         lines.add(format("public class %s {", className));
         lines.add("");
-        lines.add(format("    // user.dir: %s", System.getProperty("user.dir")));
-        lines.add(format("    //      '.': %s", get(".").toAbsolutePath().normalize()));
+        lines.add(format("    // user.dir: %s", normalizePath(System.getProperty("user.dir"))));
+        lines.add(format("    //      '.': %s", normalizePath(get(".").toAbsolutePath().normalize())));
         lines.add("");
-        lines.add(format("    //   output: %s", outputDirectory));
-        lines.add(format("    //           %s (normalized)", outputDirectory.toAbsolutePath().normalize()));
+        lines.add(format("    //   output: %s", normalizePath(outputDirectory)));
+        lines.add(format("    //           %s (normalized)", normalizePath(outputDirectory.toAbsolutePath().normalize())));
         lines.add("");
         inputFiles.forEach(p -> {
 
             try {
-                lines.add(format("    // %s (%d bytes)", p.toString(), size(p)));
+                lines.add(format("    // %s (%d bytes)", normalizePath(p), size(p)));
             } catch (IOException e) {
-                lines.add(format("    // %s: %s", p.toString(), e.getMessage()));
+                lines.add(format("    // %s: %s", normalizePath(p), e.getMessage()));
             }
 
         });
