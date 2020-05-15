@@ -22,6 +22,8 @@
     <protobuf-version>3.11.4</protobuf-version>
     <junit-jupiter-version>5.6.0</junit-jupiter-version>
     <slf4j.version>1.7.25</slf4j.version>
+    <apache-text-version>1.8</apache-text-version>
+    <apache-lang-version>3.10</apache-lang-version>
   </properties>
 
   <dependencyManagement>
@@ -61,6 +63,16 @@
           <artifactId>jcl-over-slf4j</artifactId>
           <version>${slf4j.version}</version>
       </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-text</artifactId>
+          <version>${apache-text-version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>${apache-lang-version}</version>
+      </dependency>
 
       <!-- test dependencies -->
       <dependency>
@@ -88,6 +100,14 @@
     <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
     </dependency>
 
     <!-- pre-configure logging -->

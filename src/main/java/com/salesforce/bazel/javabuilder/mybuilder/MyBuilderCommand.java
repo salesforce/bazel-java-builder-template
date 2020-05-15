@@ -19,6 +19,8 @@ import com.google.common.base.CharMatcher;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 @Command(name = "mybuilder", description = "A sample builder which generates a file")
 public class MyBuilderCommand implements Callable<Integer> {
 
@@ -64,6 +66,8 @@ public class MyBuilderCommand implements Callable<Integer> {
         if (!isDirectory(packageDirectory)) {
             createDirectories(packageDirectory);
         }
+
+        lines.replaceAll(l -> StringEscapeUtils.escapeJava(l));
 
         write(packageDirectory.resolve(format("%s.java", className)), lines);
 

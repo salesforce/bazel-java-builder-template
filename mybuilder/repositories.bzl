@@ -75,6 +75,22 @@ def rules_mybuilder_dependencies(
         server_urls = maven_servers,
     )
 
+    jvm_maven_import_external(
+        name = "mybuilder_rules_apache_commons_text",
+        artifact = "org.apache.commons:commons-text:1.8",
+        artifact_sha256 = "",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
+    jvm_maven_import_external(
+        name = "mybuilder_rules_apache_commons_lang",
+        artifact = "org.apache.commons:commons-lang3:3.10",
+        artifact_sha256 = "",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
 def rules_mybuilder_toolchains():
     # intentionally empty
     return

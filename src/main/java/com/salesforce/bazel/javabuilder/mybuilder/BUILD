@@ -15,6 +15,8 @@ java_binary(
         "//src/main/java/com/salesforce/bazel/javabuilder/worker",
         "@mybuilder_rules_guava",
         "@mybuilder_rules_picocli",
+        "@mybuilder_rules_apache_commons_text",
+        "@mybuilder_rules_apache_commons_lang",
     ],
     runtime_deps = [
     	"@mybuilder_rules_org_slf4j_simple",
