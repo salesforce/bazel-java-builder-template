@@ -76,6 +76,19 @@ def _mybuilder_gen_impl(ctx):
     )
 
     # compile the code
+    #
+    #
+    #
+    #
+    # IMPORTANT: This is a recommended approach. However, it might not work in your specific case.
+    # For example, if your generated code has cyclic dependencies to other code in the package it
+    # must be compiled together with that code. In this case the rules should ONLY produce a src jar but not compile it.
+    #
+    #
+    #
+    # (Delete this text when you're certain what to do.)
+    #
+    #
     java_info = java_common.compile(
         ctx,
         java_toolchain = ctx.attr._java_toolchain[java_common.JavaToolchainInfo],

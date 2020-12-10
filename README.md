@@ -1,6 +1,23 @@
 # Bazel Java Builder Template
 A template for wrapping a based Java source generator (eg., Maven Takari based mojos) and bring it into Bazel.
 
+## Prerequisite
+
+Before diving into writing Bazel rules for your source generator please learn about the fundamentals of Bazel and Bazel rules.
+
+* [Bazel Overview](https://docs.bazel.build/versions/master/bazel-overview.html)
+  * [Concepts and terminology](https://docs.bazel.build/versions/master/build-ref.html)
+  * [Best Practices](https://docs.bazel.build/versions/master/best-practices.html)
+* [Extension overview](https://docs.bazel.build/versions/master/skylark/concepts.html)
+  * [Macros](https://docs.bazel.build/versions/master/skylark/macros.html)
+  * [Rules](https://docs.bazel.build/versions/master/skylark/rules.html)
+* [Starlark](https://docs.bazel.build/versions/master/skylark/language.html)
+* [.bzl style guide](https://docs.bazel.build/versions/master/skylark/bzl-style.html)
+
+You should be able to explain the use of actions, action graph, macros vs. rules, packages vs. targets, repository rules and sandboxing.
+If you can't please do not continue unless you can.
+
+
 ## Setup
 
 If you want to use the latest stable release, add the following:
