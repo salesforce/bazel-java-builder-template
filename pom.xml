@@ -18,8 +18,8 @@
     <maven.compiler.target>11</maven.compiler.target>
 
     <guava-version>29.0-jre</guava-version>
-    <picocli-version>4.2.0</picocli-version>
-    <protobuf-version>3.11.4</protobuf-version>
+    <picocli-version>4.6.2</picocli-version>
+    <protobuf-version>3.19.1</protobuf-version>
     <junit-jupiter-version>5.6.0</junit-jupiter-version>
     <slf4j.version>1.7.32</slf4j.version>
   </properties>
