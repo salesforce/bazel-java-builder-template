@@ -5,14 +5,14 @@ A template for wrapping a based Java source generator (eg., Maven Takari based m
 
 Before diving into writing Bazel rules for your source generator please learn about the fundamentals of Bazel and Bazel rules.
 
-* [Bazel Overview](https://docs.bazel.build/versions/master/bazel-overview.html)
-  * [Concepts and terminology](https://docs.bazel.build/versions/master/build-ref.html)
-  * [Best Practices](https://docs.bazel.build/versions/master/best-practices.html)
-* [Extension overview](https://docs.bazel.build/versions/master/skylark/concepts.html)
-  * [Macros](https://docs.bazel.build/versions/master/skylark/macros.html)
-  * [Rules](https://docs.bazel.build/versions/master/skylark/rules.html)
-* [Starlark](https://docs.bazel.build/versions/master/skylark/language.html)
-* [.bzl style guide](https://docs.bazel.build/versions/master/skylark/bzl-style.html)
+* [Intro to Bazel](https://bazel.build/start/bazel-intro)
+  * [Workspaces, packages, and targets](https://bazel.build/concepts/build-ref)
+  * [Best Practices](https://bazel.build/docs/best-practices)
+* [Extension overview](https://bazel.build/rules/concepts)
+  * [Macros](https://bazel.build/rules/macros)
+  * [Rules](https://bazel.build/rules/rules)
+* [Starlark Language](https://bazel.build/rules/language)
+* [.bzl style guide](https://bazel.build/rules/bzl-style)
 
 You should be able to explain the use of actions, action graph, macros vs. rules, packages vs. targets, repository rules and sandboxing.
 If you can't please do not continue unless you can.
@@ -65,7 +65,7 @@ bazel build --override_repository=salesforce_rules_mybuilder=/Users/me/developme
 ## How it works
 
 This template was heavily inspired by [rules_scala](https://github.com/bazelbuild/rules_scala/) and [rules_avro](https://github.com/meetup/rules_avro).
-It follows the recommendation given by [Deploying Rules](https://docs.bazel.build/versions/master/skylark/deploying.html).
+It follows the recommendation given by [Deploying Rules](https://bazel.build/rules/deploying).
 It's designed to allow wrapping existing Java builders (eg., like Maven Takari builders) for Bazel.
 These builders don't need to be pre-built.
 Instead they will be compiled as part of the Bazel build using those.
