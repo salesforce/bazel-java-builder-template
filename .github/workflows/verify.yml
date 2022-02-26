@@ -1,0 +1,12 @@
+name: Verify examples
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v1
+      - working-directory: examples/001-simple
+        run: bazel build //...
+      - working-directory: examples/002-multiple
+        run: bazel build //...
