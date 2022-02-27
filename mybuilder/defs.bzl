@@ -92,7 +92,6 @@ def _mybuilder_gen_impl(ctx):
     java_info = java_common.compile(
         ctx,
         java_toolchain = ctx.attr._java_toolchain[java_common.JavaToolchainInfo],
-        host_javabase = ctx.attr._host_javabase[java_common.JavaRuntimeInfo],
         source_jars = [srcjar],
         output = ctx.outputs.jar,
         output_source_jar = ctx.outputs.srcjar,
