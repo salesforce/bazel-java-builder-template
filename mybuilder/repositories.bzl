@@ -16,7 +16,8 @@ def rules_mybuilder_dependencies(
     here by declaring a jvm_maven_import_external before calling this method. Bazel has a
     first-one wins rule.
 
-    maven_servers: list of Maven servers to fetch artifacts from
+    Args:
+        maven_servers: list of Maven servers to fetch artifacts from
     """
 
     jvm_maven_import_external(
@@ -73,6 +74,25 @@ def rules_mybuilder_dependencies(
         artifact_sha256 = "71e9ee37b9e4eb7802a2acc5f41728a4cf3915e7483d798db3b4ff2ec8847c50",
         licenses = ["notice"],
         server_urls = maven_servers,
+    )
+
+    jvm_maven_import_external(
+        name = "mybuilder_rules_spring_core",
+        artifact = "org.springframework:spring-core:5.3.17",
+        artifact_sha256 = "a9a39bc84a91ab6489df07df027dd5520c037e617c9f69e21c422a6d3a77d28a",
+        licenses = ["notice"],
+        server_urls = maven_servers,
+    )
+
+    # development time dependencies
+    maybe(
+        http_archive,
+        name = "rules_pkg",
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.6.0/rules_pkg-0.6.0.tar.gz",
+            "https://github.com/bazelbuild/rules_pkg/releases/download/0.6.0/rules_pkg-0.6.0.tar.gz",
+        ],
+        sha256 = "62eeb544ff1ef41d786e329e1536c1d541bb9bcad27ae984d57f18f314018e66",
     )
 
 def rules_mybuilder_toolchains():

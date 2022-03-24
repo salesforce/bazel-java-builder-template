@@ -154,9 +154,9 @@ mybuilder_gen = rule(
         "_mybuilder": attr.label(
             doc = "Implicit dependency to the java_binary for executing the source code generator.",
             default = Label(
-                "//src/main/java/com/salesforce/bazel/javabuilder/mybuilder",
+                "//:mybuilder",
             ),
-            cfg = "host",
+            cfg = "exec", # you should change this to target if mybuilder depends on application code
             executable = True,
             allow_files = True,
         ),
@@ -164,13 +164,8 @@ mybuilder_gen = rule(
             default = Label("@bazel_tools//tools/jdk:current_java_toolchain"),
             providers = [java_common.JavaToolchainInfo],
         ),
-        "_host_javabase": attr.label(
-            cfg = "host",
-            default = Label("@bazel_tools//tools/jdk:current_java_runtime"),
-            providers = [java_common.JavaRuntimeInfo],
-        ),
         "_singlejar": attr.label(
-            cfg = "host",
+            cfg = "exec",
             default = Label("@bazel_tools//tools/jdk:singlejar"),
             executable = True,
             allow_files = True,

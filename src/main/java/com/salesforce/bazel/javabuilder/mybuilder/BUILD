@@ -1,27 +1,21 @@
 package(default_visibility = ["//visibility:private"])
-java_binary(
+java_library(
     name = "mybuilder",
     srcs = [
         ":mybuilder_files",
     ],
-    javacopts = [
-        "-source 1.8",
-        "-target 1.8",
-    ],
-    main_class = "com.salesforce.bazel.javabuilder.mybuilder.MyBuilderInvoker",
-    visibility = ["//visibility:public"],
+    visibility = ["//:__pkg__"],
     deps = [
         "//src/main/java/com/google/devtools/build/lib/worker",
         "//src/main/java/com/salesforce/bazel/javabuilder/worker",
         "@mybuilder_rules_guava",
         "@mybuilder_rules_picocli",
+        "@mybuilder_rules_spring_core",
     ],
     runtime_deps = [
     	"@mybuilder_rules_org_slf4j_simple",
+        "//src/main:mybuilder_resources"
     ],
-    resources = [
-    	"//src/main/resources:slf4j_simple_properties",
-    ]
 )
 
 filegroup(
@@ -30,5 +24,5 @@ filegroup(
         "MyBuilderCommand.java",
         "MyBuilderInvoker.java",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [":__pkg__"],
 )

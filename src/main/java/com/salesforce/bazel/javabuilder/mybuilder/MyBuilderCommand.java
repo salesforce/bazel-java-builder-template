@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
 import com.google.common.base.CaseFormat;
 import com.google.common.base.CharMatcher;
 
@@ -40,6 +43,10 @@ public class MyBuilderCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         String packageName = currentTarget.toLowerCase();
         String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, CharMatcher.is('-').replaceFrom(currentTarget, '_'));
+
+        Resource[] result = collectResources();
+        if (result.length != 2)
+            throw new IllegalStateException("Resources not loaded correctly from classpath!");
 
         List<String> lines = new ArrayList<>();
         lines.add(format("package %s;", packageName));
@@ -73,6 +80,21 @@ public class MyBuilderCommand implements Callable<Integer> {
         write(packageDirectory.resolve(format("%s.java", className)), lines);
 
         return 0;
+    }
+
+    /**
+     * This method simulated resource collection from classpath.
+     * <p>
+     * This might be useful if your build code uses Spring PathMatchingResourcePatternResolver or other similar libraries.
+     * </p>
+     *
+     * @return a set of URLs
+     * @throws IOException
+     */
+    private Resource[] collectResources() throws IOException {
+        final PathMatchingResourcePatternResolver resolver =
+                new PathMatchingResourcePatternResolver(MyBuilderCommand.class.getClassLoader());
+        return resolver.getResources("classpath*:/files/*.txt");
     }
 
 }
