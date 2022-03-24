@@ -27,6 +27,7 @@ java_import(
     visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__", "//:__pkg__"],
 )
 
+# https://github.com/bazelbuild/bazel/issues/15111
 java_library(
     name = "mybuilder_resources",
     resources = glob(include = ["resources/**"]),
