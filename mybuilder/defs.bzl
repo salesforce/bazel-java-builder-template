@@ -158,7 +158,6 @@ mybuilder_gen = rule(
             ),
             cfg = "exec", # you should change this to target if mybuilder depends on application code
             executable = True,
-            allow_files = True,
         ),
         "_java_toolchain": attr.label(
             default = Label("@bazel_tools//tools/jdk:current_java_toolchain"),
@@ -168,7 +167,6 @@ mybuilder_gen = rule(
             cfg = "exec",
             default = Label("@bazel_tools//tools/jdk:singlejar"),
             executable = True,
-            allow_files = True,
         ),
     },
     fragments = ["java"],
