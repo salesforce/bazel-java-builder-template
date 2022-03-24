@@ -27,8 +27,8 @@ java_import(
     visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__", "//:__pkg__"],
 )
 
-# https://github.com/bazelbuild/bazel/issues/15111
-# this might actually be a Spring issue!
+# https://github.com/bazelbuild/bazel/issues/15111 or
+# https://github.com/spring-projects/spring-framework/issues/28230
 java_library(
     name = "mybuilder_resources_from_java_library",
     resources = glob(include = ["resources/**"]),
