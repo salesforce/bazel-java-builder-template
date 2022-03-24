@@ -22,14 +22,15 @@ pkg_zip(
 
 # make it available to java_library
 java_import(
-    name = "mybuilder_resources2",
+    name = "mybuilder_resources_from_java_import",
     jars = [":mybuilder_resourcejar"],
     visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__", "//:__pkg__"],
 )
 
 # https://github.com/bazelbuild/bazel/issues/15111
+# this might actually be a Spring issue!
 java_library(
-    name = "mybuilder_resources",
+    name = "mybuilder_resources_from_java_library",
     resources = glob(include = ["resources/**"]),
     resource_strip_prefix = "src/main/resources",
     visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__", "//:__pkg__"],
