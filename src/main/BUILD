@@ -22,7 +22,14 @@ pkg_zip(
 
 # make it available to java_library
 java_import(
-    name = "mybuilder_resources",
+    name = "mybuilder_resources2",
     jars = [":mybuilder_resourcejar"],
-    visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__"],
+    visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__", "//:__pkg__"],
+)
+
+java_library(
+    name = "mybuilder_resources",
+    resources = glob(include = ["resources/**"]),
+    resource_strip_prefix = "src/main/resources",
+    visibility = ["//src/main/java/com/salesforce/bazel/javabuilder/mybuilder:__pkg__", "//:__pkg__"],
 )
