@@ -35,22 +35,21 @@ def _run_mybuilder(ctx):
         progress_message = "mybuilder generating sources %s" % current_target.name,
     )
 
-    return depset(direct = [gen_dir])
+    return gen_dir
 
-def _path_to_short_path_mapping_for_singlejar(file):
-    """Helper for the singlejar tool to create a path with mapping.
+def _resource_mapper_srcjar(file):
+    """Helper for the singlejar tool to create a path mapping using tree_relative_path (to have Java packages and their source files in the root of the jar).
 
     Args:
      file: the file object
     """
-    return file.path + ":" + file.short_path
+    return file.path + ":" + file.tree_relative_path
 
 def _mybuilder_gen_impl(ctx):
     current_target = ctx.label
 
     # run the builder
     gen_dir = _run_mybuilder(ctx)
-    gen_dir_files = gen_dir.to_list()
 
     # generate interim srcjar
     # (we use the singlejar tool here for normalizing timestamps)
@@ -61,18 +60,20 @@ def _mybuilder_gen_impl(ctx):
     srcjar_args.add_all([
         "--normalize",
         "--compression",
+        "--exclude_build_data",
     ])
     srcjar_args.add("--output", srcjar)
-    srcjar_args.add_all(gen_dir_files, before_each = "--resources", map_each = _path_to_short_path_mapping_for_singlejar)
+    srcjar_args.add_all("--resources", [dir], map_each = _resource_mapper_srcjar)
     srcjar_args.use_param_file("@%s", use_always = True)
     srcjar_args.set_param_file_format("multiline")
+
     ctx.actions.run(
-        mnemonic = "MyBuildSrcJar",
-        inputs = gen_dir_files,
+        mnemonic = "SrcJar",
+        inputs = [gen_dir],
         outputs = [srcjar],
-        executable = ctx.executable._singlejar,
+        executable = ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"].java.single_jar,
         arguments = [srcjar_args],
-        progress_message = "Creating interim source jar %s for compilation" % srcjar.basename,
+        progress_message = "Creating %s at %s" % (srcjar.basename, ctx.label),
     )
 
     # compile the code
@@ -91,7 +92,7 @@ def _mybuilder_gen_impl(ctx):
     #
     java_info = java_common.compile(
         ctx,
-        java_toolchain = ctx.attr._java_toolchain[java_common.JavaToolchainInfo],
+        java_toolchain = ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"].java,
         source_jars = [srcjar],
         output = ctx.outputs.jar,
         output_source_jar = ctx.outputs.srcjar,
@@ -112,7 +113,7 @@ def _mybuilder_gen_impl(ctx):
     #
     return [
         DefaultInfo(
-            files = gen_dir,
+            files = depset(direct = [gen_dir]),
         ),
         java_info,
     ]
@@ -159,18 +160,10 @@ mybuilder_gen = rule(
             cfg = "exec", # you should change this to target if mybuilder depends on application code
             executable = True,
         ),
-        "_java_toolchain": attr.label(
-            default = Label("@bazel_tools//tools/jdk:current_java_toolchain"),
-            providers = [java_common.JavaToolchainInfo],
-        ),
-        "_singlejar": attr.label(
-            cfg = "exec",
-            default = Label("@bazel_tools//tools/jdk:singlejar"),
-            executable = True,
-        ),
     },
     fragments = ["java"],
     provides = [JavaInfo],
+    toolchains = ['@bazel_tools//tools/jdk:toolchain_type'],
     implementation = _mybuilder_gen_impl,
 )
 
