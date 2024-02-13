@@ -13,10 +13,17 @@ pkg_files(
     prefix = None,
 )
 
+pkg_files(
+    name = "dummy_manifest",
+    srcs = ["MANIFEST.MF"],
+    strip_prefix = strip_prefix.files_only(),
+    prefix = "META-INF/",
+)
+
 # create the jar for java_import
 pkg_zip(
     name ="mybuilder_resourcejar",
-    srcs = [":mybuilder_resource_files"],
+    srcs = [":mybuilder_resource_files", ":dummy_manifest"],
     package_file_name = "mybuilder_resources.jar",
 )
 
