@@ -11,13 +11,32 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<name>com.salesforce.bazel.eclipse.core.bazelprojectbuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+		<nature>com.salesforce.bazel.eclipse.core.bazelnature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>1707823808237</id>
+			<name></name>
+			<type>14</type>
+			<matcher>
+				<id>com.salesforce.bazel.eclipse.core.resources.filter.bazelOutputMatcher</id>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1707823940907</id>
+			<name></name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.core.resources.regexFilterMatcher</id>
+				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>

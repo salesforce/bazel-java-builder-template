@@ -1,0 +1,26 @@
+{
+    "bazel.projectview.open": false,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        ".eclipse": false,
+        ".git": false,
+        ".github": false,
+        ".settings": false,
+        "examples": false,
+        "mybuilder": false,
+        "src": false,
+        "target": false,
+        "bazel-bazel-java-builder-template": false,
+        "bazel-bin": false,
+        "bazel-out": false,
+        "bazel-testlogs": false,
+        ".vscode": false
+    },
+    "java.configuration.updateBuildConfiguration": "disabled",
+    "java.compile.nullAnalysis.mode": "disabled"
+}

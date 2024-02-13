@@ -4,11 +4,15 @@
 # bazel-* symlinks.
 bazel-*
 
-
 # output folders
 bin/
 target/
+eclipse-bin/
+eclipse-testbin/
 *.class
+
+# IDE
+.eclipse
 
 # binary files
 *.jar
