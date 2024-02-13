@@ -63,7 +63,7 @@ def _mybuilder_gen_impl(ctx):
         "--exclude_build_data",
     ])
     srcjar_args.add("--output", srcjar)
-    srcjar_args.add_all("--resources", [dir], map_each = _resource_mapper_srcjar)
+    srcjar_args.add_all("--resources", [gen_dir], map_each = _resource_mapper_srcjar)
     srcjar_args.use_param_file("@%s", use_always = True)
     srcjar_args.set_param_file_format("multiline")
 

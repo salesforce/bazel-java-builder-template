@@ -1,11 +1,10 @@
-workspace(name = "example_001")
+workspace(name = "example_001_git")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "rules_mybuilder",
-    branch = "master",
+    branch = "main",
     remote = "git@github.com:salesforce/bazel-java-builder-template.git",
 )
 
